@@ -1,0 +1,28 @@
+name	type	component	tracked_point	sampling_frequency	trackings_system	unit
+1827_acc_x	ACC	x	Linker Fuß	100	imu	m/s^2
+1827_acc_y	ACC	y	Linker Fuß	100	imu	m/s^2
+1827_acc_z	ACC	z	Linker Fuß	100	imu	m/s^2
+1827_gyro_x	GYRO	x	Linker Fuß	100	imu	deg/s
+1827_gyro_y	GYRO	y	Linker Fuß	100	imu	deg/s
+1827_gyro_z	GYRO	z	Linker Fuß	100	imu	deg/s
+1827_mag_x	MAG	x	Linker Fuß	100	imu	gauss
+1827_mag_y	MAG	y	Linker Fuß	100	imu	gauss
+1827_mag_z	MAG	z	Linker Fuß	100	imu	gauss
+1828_acc_x	ACC	x	Rechter Fuß	100	imu	m/s^2
+1828_acc_y	ACC	y	Rechter Fuß	100	imu	m/s^2
+1828_acc_z	ACC	z	Rechter Fuß	100	imu	m/s^2
+1828_gyro_x	GYRO	x	Rechter Fuß	100	imu	deg/s
+1828_gyro_y	GYRO	y	Rechter Fuß	100	imu	deg/s
+1828_gyro_z	GYRO	z	Rechter Fuß	100	imu	deg/s
+1828_mag_x	MAG	x	Rechter Fuß	100	imu	gauss
+1828_mag_y	MAG	y	Rechter Fuß	100	imu	gauss
+1828_mag_z	MAG	z	Rechter Fuß	100	imu	gauss
+1829_acc_x	ACC	x	Hüfte	100	imu	m/s^2
+1829_acc_y	ACC	y	Hüfte	100	imu	m/s^2
+1829_acc_z	ACC	z	Hüfte	100	imu	m/s^2
+1829_gyro_x	GYRO	x	Hüfte	100	imu	deg/s
+1829_gyro_y	GYRO	y	Hüfte	100	imu	deg/s
+1829_gyro_z	GYRO	z	Hüfte	100	imu	deg/s
+1829_mag_x	MAG	x	Hüfte	100	imu	gauss
+1829_mag_y	MAG	y	Hüfte	100	imu	gauss
+1829_mag_z	MAG	z	Hüfte	100	imu	gauss
