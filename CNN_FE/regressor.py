@@ -11,13 +11,15 @@ import csv
 from lin_regression import LinPredictor
 from conv1d_net import ConvRegressor
 from pd_dataset import PDDataset
-import seaborn as sns
-import pytorch_forecasting as pfc
-from pytorch_forecasting.metrics import RMSE
-from timeseries_data import make_dataset
+#import seaborn as sns
+#import pytorch_forecasting as pfc
+#from pytorch_forecasting.metrics import RMSE
+#from timeseries_data import make_dataset
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 max_length = 512
+
+
 
 
 def get_file_names():
@@ -38,7 +40,7 @@ def get_data(file_names):
 
 if __name__=='__main__':
     file_names = get_file_names()
-    train_files, test_files = file_names[:19]+file_names[20:], [file_names[19]]
+    train_files, test_files = file_names[:38]+file_names[39:], [file_names[38]]
     print('Test:',test_files)
     train_data = PDDataset(train_files)
     test_data = PDDataset(test_files)
@@ -86,7 +88,7 @@ if __name__=='__main__':
             
         
             # Calculating the loss function
-            loss = loss_function(predicted, label.unsqueeze(1))
+            loss = loss_function(predicted, label.unsqueeze(1).cuda())
       
         # the the gradient is computed and stored.
         # .step() performs parameter update
@@ -97,7 +99,7 @@ if __name__=='__main__':
         model.eval()
         with torch.no_grad():
             for batch,label in test_dl:
-                val_loss[epoch]+=(loss_function(model(batch).squeeze(),label).item())/len(test_dl)
+                val_loss[epoch]+=(loss_function(model(batch.cuda()).squeeze(),label.cuda()).item())/len(test_dl)
         
         
         # code snippet used for early stopping
@@ -120,7 +122,7 @@ if __name__=='__main__':
 
 with torch.no_grad():
     for batch, label in test_dl:
-        print('Predicted:\n', model(batch).squeeze().detach().numpy().reshape(-1,1))
+        print('Predicted:\n', model(batch.cuda()).cpu().squeeze().detach().numpy().reshape(-1,1))
         print('Actual:\n', label.numpy().reshape(-1,1))
   
 # Defining the Plot Style
@@ -136,10 +138,10 @@ plt.ylabel('Loss')
 
 torch.save(model.state_dict(), 'regression_cnn.pkl')
 
-plt.semilogy([loss.detach().numpy() for loss in loss_per_epoch[:epoch]], label='Training loss')
-plt.semilogy(val_loss[:epoch], label='Validation loss')
-plt.legend()
-plt.show()
+# plt.semilogy([loss.detach().numpy() for loss in loss_per_epoch[:epoch]], label='Training loss')
+# plt.semilogy(val_loss[:epoch], label='Validation loss')
+# plt.legend()
+# plt.show()
 
 # write extracted features to csv file
 f= open('features.csv', 'w')
@@ -147,7 +149,7 @@ writer = csv.writer(f)
 data = PDDataset(file_names)
 for i in range(len(data)):
     file_name, sensor_data, label = data.get_data_with_fn(i)
-    row = np.concatenate([[file_name], model.conv(sensor_data.unsqueeze(0)).flatten().detach().numpy(), [label]])
+    row = np.concatenate([[file_name], model.conv(sensor_data.unsqueeze(0).cuda()).cpu().flatten().detach().numpy(), [label]])
     writer.writerow(row)
 f.close()
 

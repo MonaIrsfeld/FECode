@@ -15,7 +15,7 @@ from time import time
 from sklearn.neighbors import KNeighborsRegressor
 import csv
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
+# import statsmodels.api as sm
 
 def shuffleInUnison(X,y):
     assert len(X) == len(y)
@@ -181,7 +181,8 @@ def prepare_data_for_fold(fold_dictionary, fold_idx):
 
 if __name__=='__main__':
     to_eval = float(input('Label to evaluate:'))
-    #X, y = read_data()
+    # X, y = read_data()
+    # print(X.shape)
     features = get_extracted_features_cnn()
     X = features[:,:-1]
     y = features[:,-1]
@@ -189,7 +190,6 @@ if __name__=='__main__':
     # with open('tmp_data.csv', 'w') as f:
     #     writer = csv.writer(f)
     #     writer.writerows(X)
-    print(X.shape)
     # X_new = np.zeros((X.shape[0], 100))
     # X_new = preprocessing(X[:,1:])
     # X = X[:,:101]
@@ -230,6 +230,12 @@ if __name__=='__main__':
         # for i in range(len(y_train)):
         #     print('Predicted:', predictions_train[i], 'Actual:', y_train[i])
         predictions_test = regressor.predict(X_test)
+        # with open('eval_hc.csv', 'a', newline='') as f:
+        #     writer = csv.writer(f)
+        #     rows = np.zeros((len(predictions_test), 2))
+        #     rows[:,0] = predictions_test
+        #     rows[:,1] = y_test
+        #     writer.writerows(rows)
         if np.abs(np.min(y_test)-to_eval)<0.1:
             with open('eval.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
