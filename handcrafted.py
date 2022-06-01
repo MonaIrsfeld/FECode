@@ -114,26 +114,26 @@ def preprocessing(data):
 def evaluation(predictions, labels):
     return (mean_squared_error(labels,predictions)+mean_absolute_error(labels,predictions))/2
 
-def loo_folds(X,y):
+def loo_folds(X,y, eval_id):
     X, y = shuffleInUnison(X,y)
     ids = np.unique(X[:,0])
     np.random.shuffle(ids)
     k = len(np.unique(X[:,0]))
-    print(X[np.where(X[:,0]==ids[1]),0])
+    idx = 0
+    #print(X[np.where(X[:,0]==ids[1]),0])
     output = dict()
+    labels = []
     for i in range(k):
-        output[i] = (X[np.where(X[:,0]==ids[i]),1:][0],y[np.where(X[:,0]==ids[i])])
-    unique_labels = []
-    for i in range(k):
-        label = output[i][1][0]
-        # print(label)
-        # print(np.mean(output[i][1]))
-        # assert np.mean(output[i][1])==label
-        unique_labels.append(label)
-    print('Standard deviation:',np.std(unique_labels))
-    print(output[2][0].shape)
-    perm = np.random.permutation(k)
-    return output
+        if str(eval_id) in ids[i]:
+            test = (X[np.where(X[:,0]==ids[i]),1:][0],y[np.where(X[:,0]==ids[i])])
+        else:
+            output[idx] = (X[np.where(X[:,0]==ids[i]),1:][0],y[np.where(X[:,0]==ids[i])])
+            idx = idx+1
+        labels.append(np.mean(y[np.where(X[:,0]==ids[i])]))
+    print('Standard deviation:',np.std(labels))
+    print(len(output.keys()))
+    #print(test)
+    return output, test
 
 def prepare_k_folds(X, y, k=3):
     X, y = shuffleInUnison(X,y)
@@ -179,41 +179,40 @@ def prepare_data_for_fold(fold_dictionary, fold_idx):
     return X_train, y_train, X_test, y_test
 
 
+def training_data_for_val(fold_dictionary):
+    num_features = fold_dictionary[0][0].shape[1]
+    num_training_examples = 0
+    for idx in fold_dictionary.keys():
+        num_training_examples += fold_dictionary[idx][0].shape[0]
+    X_train = np.zeros((num_training_examples,num_features))
+    y_train = np.zeros(num_training_examples,dtype=float)
+    # Filling out training data and label arrays
+    current_idx = 0
+    for idx in fold_dictionary.keys():
+            current_num_examples = fold_dictionary[idx][0].shape[0]
+            X_train[current_idx:current_idx+current_num_examples] = fold_dictionary[idx][0]
+            y_train[current_idx:current_idx+current_num_examples] = fold_dictionary[idx][1]
+            current_idx += current_num_examples
+    
+    return X_train, y_train
+
+
 if __name__=='__main__':
-    to_eval = float(input('Label to evaluate:'))
+    to_eval = input('ID to evaluate:')
     # X, y = read_data()
     # print(X.shape)
     features = get_extracted_features_cnn()
     X = features[:,:-1]
     y = features[:,-1]
     #X, y = get_extracted_features_autoenc()
-    # with open('tmp_data.csv', 'w') as f:
-    #     writer = csv.writer(f)
-    #     writer.writerows(X)
-    # X_new = np.zeros((X.shape[0], 100))
-    # X_new = preprocessing(X[:,1:])
-    # X = X[:,:101]
-    # X[:,1:] = X_new
-    #X[:,1:] = preprocessing(X[:,1:])
-
-    #X[:,1:]=preprocessing(X[:,1:])
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=202)
-    #X_train = preprocessing(X_train)
     start = time()
     regressor = RandomForestRegressor()
-    # regressor = SVR(kernel='sigmoid',degree=10, epsilon=0.1, gamma='auto')
-    #regressor = GradientBoostingRegressor()
-    #regressor = SGDRegressor(max_iter=10000)
-    #regressor = KNeighborsRegressor(n_neighbors=1)
-    #regressor = Ridge()
-    #rfe = RFE(regressor, n_features_to_select=100)
-    #print('Training RFE')
-    #X = rfe.fit_transform(X, y)
     print('RFE trained in %.2f seconds' % (time()-start))
     # k = X.shape[0]
     # folds = prepare_k_folds(X, y,k)
-    k = len(np.unique(X[:,0]))
-    folds = loo_folds(X,y)
+    k = len(np.unique(X[:,0]))-1
+    folds, test_fold = loo_folds(X,y, to_eval)
+    print(len(folds.keys()))
     rmses = np.zeros(k) # Array to store the accuracies on each fold
     maes = np.zeros(k)
     r2_scores = np.zeros(k)
@@ -236,13 +235,6 @@ if __name__=='__main__':
         #     rows[:,0] = predictions_test
         #     rows[:,1] = y_test
         #     writer.writerows(rows)
-        if np.abs(np.min(y_test)-to_eval)<0.1:
-            with open('eval.csv', 'a', newline='') as f:
-                writer = csv.writer(f)
-                rows = np.zeros((len(predictions_test), 2))
-                rows[:,0] = predictions_test
-                rows[:,1] = y_test
-                writer.writerows(rows)
         print('Predicted:', predictions_test, 'Actual:', np.mean(y_test))
         # for i in range(len(y_test)):
         #     print('Predicted:', predictions_test[i], 'Actual:', y_test[i])
@@ -250,9 +242,21 @@ if __name__=='__main__':
         print("Mean absolute error: ",maes[idx])
         rmses[idx] = np.sqrt(mean_squared_error(y_test,predictions_test))
         print("Mean squared error: ", rmses[idx]**2)
-        r2_scores[idx] = regressor.score(X[:,1:], y)
         x_axis.append(np.mean(y_test))
         y_axis.append(maes[idx])
+    X_test, y_test = test_fold
+    X_train, y_train = training_data_for_val(folds)
+    regressor.fit(X_train, y_train)
+    predictions_test = regressor.predict(X_test)
+    print('Predicted:', predictions_test, 'Actual:', np.mean(y_test))
+    print("Mean absolute error: ", mean_absolute_error(y_test, predictions_test))
+    print("Mean absolute error: ", mean_absolute_error(y_test, predictions_test))
+    with open('eval_files/eval_normal.csv', 'a', newline='') as f:
+        writer = csv.writer(f)
+        rows = np.zeros((len(predictions_test), 2))
+        rows[:,0] = predictions_test
+        rows[:,1] = y_test
+        writer.writerows(rows)
 
 
 
@@ -261,8 +265,6 @@ if __name__=='__main__':
     print('OOB Score:', regr_oob.oob_score_) 
     r_squared = regr_oob.score(X[:,1:], y)
     print('R^2:', r_squared)
-    print('Mean r2:', np.mean(r2_scores))
-    print('F value:', r_squared/(1-r_squared)*(X.shape[0]-X.shape[1])/(X.shape[1]-1))
     end = time()
     print('All %d regression models trained in %.2f seconds' % (k,end-start))
     print('###################################################################')

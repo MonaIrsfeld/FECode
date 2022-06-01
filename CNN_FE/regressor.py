@@ -24,7 +24,7 @@ max_length = 512
 
 def get_file_names():
     file_names = glob.glob("./00_raw/sub-COKI*/sub-COKI*_ses-T1_*_tracksys-imu.tsv")
-    return [name for name in file_names if 'subtract' in name]
+    return [name for name in file_names if 'normal' in name]
 
 
 def get_data(file_names):
@@ -40,7 +40,8 @@ def get_data(file_names):
 
 if __name__=='__main__':
     file_names = get_file_names()
-    train_files, test_files = file_names[:38]+file_names[39:], [file_names[38]]
+    print(len(file_names))
+    train_files, test_files = file_names[:9]+file_names[10:], [file_names[9]]
     print('Test:',test_files)
     train_data = PDDataset(train_files)
     test_data = PDDataset(test_files)
