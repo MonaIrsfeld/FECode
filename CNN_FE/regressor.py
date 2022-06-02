@@ -41,7 +41,7 @@ def get_data(file_names):
 if __name__=='__main__':
     file_names = get_file_names()
     print(len(file_names))
-    train_files, test_files = file_names[:9]+file_names[10:], [file_names[9]]
+    train_files, test_files = file_names[:144], [file_names[144]]
     print('Test:',test_files)
     train_data = PDDataset(train_files)
     test_data = PDDataset(test_files)

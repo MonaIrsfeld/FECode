@@ -4,7 +4,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from scipy.stats import mannwhitneyu
 
 if __name__=='__main__':
-    values = pd.read_csv('eval.csv', header=None).values
+    values = pd.read_csv('eval_files/eval_normal.csv', header=None).values
     pred = values[:,0]
     labels = values[:,1]
     mae = mean_absolute_error(pred, labels)
@@ -14,7 +14,7 @@ if __name__=='__main__':
     print('RMSE:', rmse)
     print('Correlation:', corr)
     errors_cnn = np.abs(pred-labels)
-    values_hc = pd.read_csv('eval_hc.csv', header=None).values
+    values_hc = pd.read_csv('eval_files/eval_hc.csv', header=None).values
     pred_hc = values_hc[:,0]
     labels_hc = values_hc[:,1]
     errors_hc = np.abs(pred_hc-labels_hc)

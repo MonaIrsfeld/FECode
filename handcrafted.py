@@ -220,37 +220,37 @@ if __name__=='__main__':
     x_axis = []
     y_axis = []
     
-    for idx in range(k):
-        print("Training regression model for fold %d/%d ..." % (idx+1,k))
+    # for idx in range(k):
+    #     print("Training regression model for fold %d/%d ..." % (idx+1,k))
 
-        X_train, y_train, X_test, y_test = prepare_data_for_fold(folds, idx)
-        regressor.fit(X_train, y_train)
-        # predictions_train = classifier.predict(X_train)
-        # for i in range(len(y_train)):
-        #     print('Predicted:', predictions_train[i], 'Actual:', y_train[i])
-        predictions_test = regressor.predict(X_test)
-        # with open('eval_hc.csv', 'a', newline='') as f:
-        #     writer = csv.writer(f)
-        #     rows = np.zeros((len(predictions_test), 2))
-        #     rows[:,0] = predictions_test
-        #     rows[:,1] = y_test
-        #     writer.writerows(rows)
-        print('Predicted:', predictions_test, 'Actual:', np.mean(y_test))
-        # for i in range(len(y_test)):
-        #     print('Predicted:', predictions_test[i], 'Actual:', y_test[i])
-        maes[idx] = mean_absolute_error(y_test, predictions_test)
-        print("Mean absolute error: ",maes[idx])
-        rmses[idx] = np.sqrt(mean_squared_error(y_test,predictions_test))
-        print("Mean squared error: ", rmses[idx]**2)
-        x_axis.append(np.mean(y_test))
-        y_axis.append(maes[idx])
+    #     X_train, y_train, X_test, y_test = prepare_data_for_fold(folds, idx)
+    #     regressor.fit(X_train, y_train)
+    #     # predictions_train = classifier.predict(X_train)
+    #     # for i in range(len(y_train)):
+    #     #     print('Predicted:', predictions_train[i], 'Actual:', y_train[i])
+    #     predictions_test = regressor.predict(X_test)
+    #     # with open('eval_hc.csv', 'a', newline='') as f:
+    #     #     writer = csv.writer(f)
+    #     #     rows = np.zeros((len(predictions_test), 2))
+    #     #     rows[:,0] = predictions_test
+    #     #     rows[:,1] = y_test
+    #     #     writer.writerows(rows)
+    #     print('Predicted:', predictions_test, 'Actual:', np.mean(y_test))
+    #     # for i in range(len(y_test)):
+    #     #     print('Predicted:', predictions_test[i], 'Actual:', y_test[i])
+    #     maes[idx] = mean_absolute_error(y_test, predictions_test)
+    #     print("Mean absolute error: ",maes[idx])
+    #     rmses[idx] = np.sqrt(mean_squared_error(y_test,predictions_test))
+    #     print("Mean squared error: ", rmses[idx]**2)
+    #     x_axis.append(np.mean(y_test))
+    #     y_axis.append(maes[idx])
     X_test, y_test = test_fold
     X_train, y_train = training_data_for_val(folds)
     regressor.fit(X_train, y_train)
     predictions_test = regressor.predict(X_test)
     print('Predicted:', predictions_test, 'Actual:', np.mean(y_test))
     print("Mean absolute error: ", mean_absolute_error(y_test, predictions_test))
-    print("Mean absolute error: ", mean_absolute_error(y_test, predictions_test))
+    print("Mean squared error: ", mean_squared_error(y_test, predictions_test))
     with open('eval_files/eval_normal.csv', 'a', newline='') as f:
         writer = csv.writer(f)
         rows = np.zeros((len(predictions_test), 2))
@@ -270,18 +270,18 @@ if __name__=='__main__':
     print('###################################################################')
 
     # Display overall evaluation metrics averaged on all folds
-    print("All fold MAEs:")
-    print(maes)
-    print("MAE: %.2f +- %.2f" % (np.mean(maes),np.std(maes)))
-    print('###################################################################')
-    print("All fold RMSE:")
-    print(rmses)
-    print("RMSE: %.2f +- %.2f" % (np.mean(rmses),np.std(rmses)))
-    print('###################################################################')
+    # print("All fold MAEs:")
+    # print(maes)
+    # print("MAE: %.2f +- %.2f" % (np.mean(maes),np.std(maes)))
+    # print('###################################################################')
+    # print("All fold RMSE:")
+    # print(rmses)
+    # print("RMSE: %.2f +- %.2f" % (np.mean(rmses),np.std(rmses)))
+    # print('###################################################################')
     
-    indices = np.argsort(x_axis)
-    plt.plot(np.array(x_axis)[indices], np.array(y_axis)[indices])
-    plt.show()
+    # indices = np.argsort(x_axis)
+    # plt.plot(np.array(x_axis)[indices], np.array(y_axis)[indices])
+    # plt.show()
     # svm = SVR(kernel='precomputed')
     # svm = svm.fit(data, labels)
     # pred = svm.predict(data)
